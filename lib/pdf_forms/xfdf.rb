@@ -10,7 +10,7 @@ module PdfForms
     private
 
     def encode_data(pdf_data)
-      pdf_data
+      pdf_data.gsub(/[^\u{0}-\u{7E}]/){|char| "\&\##{char.unpack('U')[0]}\;"}
     end
 
     def quote(value)
