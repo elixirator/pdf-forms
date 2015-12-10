@@ -15,6 +15,7 @@ module PdfForms
     private
 
     def encode_data(fdf)
+      return fdf
       # I have yet to see a version of pdftk which can handle UTF8 input,
       # so we convert to ISO-8859-15 here, replacing unknown / invalid chars
       # with the default replacement which is '?'.
@@ -44,14 +45,14 @@ module PdfForms
 
     def field(key, value)
       "<</T(#{key})/V" +
-        (Array === value ? "[#{value.map{ |v|"(#{quote(v)})" }.join}]" : "(#{quote(value)})") +
+        (Array === value ? "[#{value.map{ |v|"#{quote(v)}" }.join(" ")}]" : "#{quote(value)}") +
         ">>\n"
     end
 
     def quote(value)
-      value.to_s.
+      "<FEFF" + value.to_s.
         gsub( /(\\|\(|\))/ ) { '\\' + $1 }.
-        gsub( /\n/, '\r' )
+        gsub( /\n/, '\r' ).encode("UTF-16BE").unpack('H*').first + "> "
     end
 
     FOOTER =<<-EOFOOTER
